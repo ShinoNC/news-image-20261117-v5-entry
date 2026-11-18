@@ -15,7 +15,7 @@
 // output directory. It reads no clock, no network and no random
 // source: run it twice and the bytes are identical.
 
-import { copyFileSync, existsSync, mkdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -32,6 +32,9 @@ function emitArtwork(): string {
   mkdirSync(outDir, { recursive: true });
   const destPath = join(outDir, ARTWORK);
   copyFileSync(sourcePath, destPath);
+  if (!existsSync(destPath) || statSync(destPath).size === 0) {
+    throw new Error(`copy failed: ${destPath} is missing or empty after copy`);
+  }
   return destPath;
 }
 
